@@ -670,7 +670,8 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
 
         // Prior <0.5.0 uninitialized local storage variables could point to unexpected storage
         // locations in the contract, which could lead to vulnerabilities.
-        // Prior <0.8.1 this was still possible in functions with a modifier
+        // The fix was a compilation error preventing usage of uninitialized local storage variables,
+        // but the issue came back under some circumstances with 0.6.5 and was fixed again with 0.8.1.
         // To prevent that, assign them immediately during declaration.
         bytes1[1] storage localStorageRef;
 
