@@ -1,0 +1,69 @@
+*.swp
+*.swo
+
+# Dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Configuration
+.env
+
+# Hardhat build files
+cache
+artifacts
+
+# truffle
+.node-xmlhttprequest-*
+build/
+
+# Test Coverage
+coverage
+coverage.json
+coverageEnv
+allFiredEvents
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+
+# OpenZeppelin Upgrade tracking on local
+.openzeppelin/unknown-*.json
+
+# OSX artifacts
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor artifacts
+.*.sw[a-z]
+*.un~
+Session.vim
+/*.sublime-project
+*.sublime-workspace
+/sftp-config.json
+.project
+*.tmp
+*~
+*.bak
+local.properties
+.settings
+.classpath
+.loadpath
+.directory
+npm-debug.log
+yarn-error.log
+.idea/*
+build/
+
+# Runtime data
+pids
+*.pid
+*.seed
+allFiredEvents
+scTopics
+
+# node-waf configuration
+.lock-wscript
