@@ -1,8 +1,8 @@
 {
   "name": "cheatsheet.sol",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "scripts": {
-    "lint": "solhint 'cheatsheet.sol'"
+    "lint": "solhint 'contracts/cheatsheet.sol'"
   },
   "devDependencies": {
     "solhint": "^3.3.6"

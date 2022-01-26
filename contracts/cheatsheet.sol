@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 // ^ recommended, included machine readable in bytecode metadata
 // Software Package Data Exchange is an open standard
 
