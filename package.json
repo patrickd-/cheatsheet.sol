@@ -2,9 +2,11 @@
   "name": "cheatsheet.sol",
   "license": "GPL-3.0",
   "scripts": {
+    "compiles": "solcjs --bin contracts/cheatsheet.sol -o /tmp/",
     "lint": "solhint 'contracts/cheatsheet.sol'"
   },
   "devDependencies": {
+    "solc": "^0.8.11",
     "solhint": "^3.3.6"
   }
 }
