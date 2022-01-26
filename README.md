@@ -11,4 +11,4 @@ This cheatsheet was once a [GitHub Gist](https://gist.github.com/patrickd-/5000f
 
 Play around with this cheatsheet in [Remix](https://remix.ethereum.org/)!
 
-Just copy everything from [cheatsheet.sol](https://raw.githubusercontent.com/patrickd-/cheatsheet.sol/main/contracts/cheatsheet.sol) into `contracts/cheatsheet.sol` of the Remix `default_workspace`.
+Create a new file `contracts/cheatsheet.sol` within Remix's `default_workspace` and copy everything from [cheatsheet.sol](https://raw.githubusercontent.com/patrickd-/cheatsheet.sol/main/contracts/cheatsheet.sol) into it.
