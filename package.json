@@ -1,0 +1,10 @@
+{
+  "name": "cheatsheet.sol",
+  "license": "MIT",
+  "scripts": {
+    "lint": "solhint 'cheatsheet.sol'"
+  },
+  "devDependencies": {
+    "solhint": "^3.3.6"
+  }
+}
