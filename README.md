@@ -5,7 +5,7 @@ This cheatsheet was once a [GitHub Gist](https://gist.github.com/patrickd-/5000f
 ---
 
 
-[![Compiles](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml)[![Lint](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml)
+[![Compiles](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml) [![Lint](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml)
 
 ## It compiles!
 
