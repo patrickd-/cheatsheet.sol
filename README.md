@@ -6,3 +6,9 @@ This cheatsheet was once a [GitHub Gist](https://gist.github.com/patrickd-/5000f
 
 
 [![Compiles](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/compiles.yaml)[![Lint](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml/badge.svg)](https://github.com/patrickd-/cheatsheet.sol/actions/workflows/lint.yaml)
+
+## It compiles!
+
+Play around with this cheatsheet in [Remix](https://remix.ethereum.org/)!
+
+Just copy everything from [cheatsheet.sol](https://raw.githubusercontent.com/patrickd-/cheatsheet.sol/main/contracts/cheatsheet.sol) into `contracts/cheatsheet.sol` of the Remix `default_workspace`.
