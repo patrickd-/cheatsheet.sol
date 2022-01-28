@@ -44,7 +44,7 @@ abstract contract TestBase {
     function nobody() external view virtual; // Must be explicitly virtual if without body.
 
     // Virtual functions that already have a body MAY be overriden.
-    function overrideMePlease(uint a) internal pure virtual returns (uint) {
+    function _overrideMePlease(uint a) internal pure virtual returns (uint) {
         return a;
     }
 
@@ -78,11 +78,11 @@ contract AdvTestBase is TestBase, TestBase2 {
     }
 
     // Function is overriden but kept virtual for further overrides.
-    function overrideMePlease(uint a) internal pure override virtual returns (uint) {
+    function _overrideMePlease(uint a) internal pure override virtual returns (uint) {
         // A Base Contract implementation, one level higher up in the flattened inheritance hierarchy,
         // can be called using super. Alternatively a specific Base Contract can be specified.
-        return super.overrideMePlease(a) ** 2;
-        // Equivalent: TestBase.overrideMePlease()
+        return super._overrideMePlease(a) ** 2;
+        // Equivalent: TestBase._overrideMePlease()
     }
 
     // When overriding a function or modifier defined in multiple parallel bases, all bases must be listed:
@@ -126,30 +126,30 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     // assign them a value to avoid incorrect assumptions or unintended use of zero-addresses.
     // An exception to this rule are upgradable contracts where the constructor wouldn't be executed in
     // the proxy's context and initialize functions are used instead – assign values in initialize()!
-    uint public pubInt = 0;        // Automatically has a public getter func of same name.
-                                   // Only public state vars can have NatSpec comments (since 0.7.0)
-    bool internal intBool = false; // Can only be used from this or inheriting contracts.
+    uint public pubInt = 0;         // Automatically has a public getter func of same name.
+                                    // Only public state vars can have NatSpec comments (since 0.7.0)
+    bool internal _intBool = false; // Can only be used from this or inheriting contracts.
 
-    bytes32[3] private privA; // contains 3, 32 bytes long bytearrays filled with zeros,
-                              //   because it's statically sized!
-                              // Can only be used within this Test contract (private),
-                              //   don't forget that all data on the blockchain is actually public.
-                              // Arrays (also bytes and strings) are reference types!
+    bytes32[3] private _privA; // contains 3, 32 bytes long bytearrays filled with zeros,
+                               //   because it's statically sized!
+                               // Can only be used within this Test contract (private),
+                               //   don't forget that all data on the blockchain is actually public.
+                               // Arrays (also bytes and strings) are reference types!
 
     uint8 public constant CONST = 42; // Is placed everywhere it's used during compile time.
-    uint8 internal immutable IMMU;    // Becomes immutable after being set during construction.
+    uint8 internal immutable _immu;   // Becomes immutable after being set during construction.
                                       // Is placed into 32 byte placeholder slots when set,
                                       // meaning in this 8bit case the constant is cheaper!
                                       // Both are placed directly into the runtime bytecode
                                       // that means no storage is used!
 
     // Only value types are supported, but constant supports strings too!
-    string private constant FOOBAR = "foobar!";
+    string private constant _FOOBAR = "foobar!";
 
     // Depending on their order, state variables can be packed into the same slot (starting at slot 0).
     // Packing reduces storage slot usage but increases opcodes necessary to read/write to them.
-    uint248 right; // 31 bytes, Doesn't fit into the previous slot, get's a new one
-    uint8   left;  // 1 byte, There's still 8 free bits in the 256 bit slot
+    uint248 _right; // 31 bytes, Doesn't fit into the previous slot, get's a new one
+    uint8   _left;  // 1 byte, There's still 8 free bits in the 256 bit slot
     // ^ one storage slot will be packed from right to left with these two values (lower-order aligned)
     // Structs and array data always start a new slot!
     // Dynamically-sized arrays use their slot p for the length, their values start being stored at keccak(p)
@@ -184,8 +184,8 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      * it would end up as a public function in the runtime bytecode, a potential vulnerability!
      */
     constructor(bytes32[] memory proposalNames, uint8 immuV) Ballot(proposalNames) {
-        IMMU = immuV + 2; // IMMU is write-only during construction and read-only afterwards
-                          // >=0.8.8 allows reading here too
+        _immu = immuV + 2; // IMMU is write-only during construction and read-only afterwards
+                            // >=0.8.8 allows reading here too
 
         // Inline assembly is a way to access the Ethereum Virtual Machine at a low level.
         // The language used for inline assembly is called Yul which has improved readability.
@@ -209,8 +209,8 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
             // For local storage variables or state variables, a single Yul identifier is not sufficient,
             // since they do not necessarily occupy a single full storage slot. Therefore, their “address”
             // is composed of a slot and a byte-offset inside that slot.
-            let rightAndLeftValues := sload(left.slot)
-            // let leftValue := rightAndLeftValues[left.offset] TODO how?
+            let rightAndLeftValues := sload(_left.slot)
+            // let leftValue := rightAndLeftValues[_left.offset] TODO how?
 
             // You can assign to the .slot part of a local storage variable pointer.
             // For these (structs, arrays or mappings), the .offset part is always zero. It is not
@@ -322,7 +322,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
                       // values, may cause unexpected behavior!
     }
     function _freeChecker() private {
-        freeeeeee(privA);
+        freeeeeee(_privA);
     }
 
     modifier paramCheck(uint test) {
@@ -401,7 +401,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         Blue
     }
 
-    function doMagic() private pure {
+    function _doMagic() private pure {
         // Since this is a reference type, we need to specify a storage location!
         MagicGroupOfVariables memory g1; // Initialized with defaults by declaration.
         g1.whereDoesItPoint = address(0x0); // Zero values can more freely be cast into addresses and bytearrays
@@ -481,7 +481,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      * If you need more control over the mapping consider using OpenZeppelin's
      * EnumerableMap or EnumerableSet libraries!
      */
-    mapping(address => MagicGroupOfVariables) magicians;
+    mapping(address => MagicGroupOfVariables) _magicians;
 
     function boolingAround(bool a, bool b, bool c) public pure returns (bool) {
         // Short-circuit rule: it won't evaluate/check the rest of the variables
@@ -548,8 +548,8 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     }
 
     // v type of array can be anything, even structs and maps
-    uint128[3] private sFixedArray;   // Fixed size at compile time.
-    uint128[] private sDynamicArray;  // Always reference types!
+    uint128[3] private _sFixedArray;   // Fixed size at compile time.
+    uint128[] private _sDynamicArray;  // Always reference types!
     function arraysOfFun(uint size) public returns (uint128[3] memory, uint128[] memory) {
         uint128[3] memory mFixedArray; // Fixed size at compile time.
 
@@ -558,25 +558,25 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         uint128[] memory mDynamicArray = new uint128[](size);
 
         // Pre 0.6.0 arrays could be resized by setting length member.
-        // sDynamicArray.length = 100;
+        // _sDynamicArray.length = 100;
 
         // Only dynamic storage arrays are resizable!
-        sDynamicArray.push(); // Empty push, appends a zero-state value!
+        _sDynamicArray.push(); // Empty push, appends a zero-state value!
                               // Constant gas cost thanks to zero-initialization
                               // Pre 0.6.0 push() returned the new length
-        sDynamicArray.pop();  // implicit "delete" on last element
+        _sDynamicArray.pop();  // implicit "delete" on last element
                               // Everything is re-set to zero-state, can be very costly!
 
         // Remove arbitrary array element (eg. first instead of last one):
         // Replace with last item and pop it off (ordering not maintained)
-        sDynamicArray[0] = sDynamicArray[sDynamicArray.length - 1];
-        sDynamicArray.pop();
+        _sDynamicArray[0] = _sDynamicArray[_sDynamicArray.length - 1];
+        _sDynamicArray.pop();
 
         // Prior <v0.7.3 had a compiler bug when assigning a dynamically sized array with types of size
         // at most 16 bytes in storage causing the assigned array to shrink, some parts of deleted slots
         // were not zeroed out.
-        sDynamicArray = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-        sDynamicArray = [2];
+        _sDynamicArray = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        _sDynamicArray = [2];
 
         // Parameters and return values should always have predictable sizes to avoid DoS.
         // Also never have loops without bounds for the same reasons.
@@ -584,21 +584,21 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     }
 
     // Special arrays: bytes and string – reference types!
-    bytes myBytes;   // Like bytes1[] but tightly packed (no padding).
-                     // For arbitrary length raw byte data.
-    string myString; // Like bytes but no length, no [x] access, no push.
-                     // Use libs for string manipulation!
-                     // For arbitrary length UTF-8 strings.
+    bytes _myBytes;   // Like bytes1[] but tightly packed (no padding).
+                      // For arbitrary length raw byte data.
+    string _myString; // Like bytes but no length, no [x] access, no push.
+                      // Use libs for string manipulation!
+                      // For arbitrary length UTF-8 strings.
     // Solidity doesn't have any string manipulation members, consider
     // looking for a library for those, eg. OpenZeppelin Strings.
     function bytesNstrings() public {
         bytes memory myMemBytes = hex"f00b43";
         string memory myMemString = "foobar";
-        myBytes = myMemBytes;
-        myString = myMemString;
+        _myBytes = myMemBytes;
+        _myString = myMemString;
         // Like arrays, only storage bytes can be resized.
-        myBytes.push(0x0);
-        // myString.push(0x0); nope for strings!
+        _myBytes.push(0x0);
+        // _myString.push(0x0); nope for strings!
         // myMemBytes.push(0x0); nope for memory!
         // myMemString.push(0x0); nope for memory!
 
@@ -606,9 +606,9 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         // memory or calldata to storage could result in data corruption if the target array's
         // length was increased subsequently without storing new data.
         bytes memory emptyBytes;
-        myBytes = emptyBytes; // Copies too much from memory to storage.
-        myBytes.push();       // Only increases length without setting storage to 0.
-        // myBytes now had whatever came after emptyBytes in memory "added" to it
+        _myBytes = emptyBytes; // Copies too much from memory to storage.
+        _myBytes.push();       // Only increases length without setting storage to 0.
+        // _myBytes now had whatever came after emptyBytes in memory "added" to it
     }
 
     function _litterally() private pure returns (address, uint, uint, string memory, string memory, string memory, bytes20, uint32[3] memory) {
@@ -653,15 +653,15 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     }
     // External functions actually consist of an address and a function signature and they can
     // be passed via and returned from external function calls.
-    function() external payable paymentCallback = this.payMe;
-    function setPaymentCallback(function() external payable _paymentCallback) external {
-        paymentCallback = _paymentCallback;
+    function() external payable _paymentCallback = this.payMe;
+    function setPaymentCallback(function() external payable paymentCallback_) external {
+        _paymentCallback = paymentCallback_;
     }
-    function getPaymentCallback() external view returns (function() external payable _paymentCallback) {
-        return paymentCallback;
+    function getPaymentCallback() external view returns (function() external payable) {
+        return _paymentCallback;
     }
 
-    bytes1[1] storageRef;
+    bytes1[1] _storageRef;
     // Specification of data locations for function parameters was optional before <0.5.0 but should
     // always be state explicitly to prevent unintended assignments between different locations.
     function locationalDisorientation(bytes1[1] calldata calldataRef) external {
@@ -676,20 +676,20 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         bytes1[1] storage localStorageRef;
 
         // Storage to local storage, references the same storage.
-        localStorageRef = storageRef;
+        localStorageRef = _storageRef;
 
         // A storage reference to memory, makes a copy.
         memoryRef = localStorageRef;
-        memoryRef = storageRef;
+        memoryRef = _storageRef;
 
         // A memory reference can't become a local storage reference.
         // localStorageRef = memoryRef;
         // But you can copy a memory value directly into storage.
-        storageRef = memoryRef;
+        _storageRef = memoryRef;
 
         // Calldata can be copied to memory or real storage.
         // localStorageRef = calldataRef;
-        storageRef = calldataRef;
+        _storageRef = calldataRef;
         memoryRef = calldataRef;
     }
 
@@ -900,22 +900,22 @@ function freeeeeee(bytes32[3] storage arrrr) {
  */
 contract Tester {
 
-    address testAddress;
+    address _testAddress;
 
-    Test target;
+    Test _target;
 
     // Often parameters are prefixed with underscore.
     // Especially when it prevents shadowing existing state vars.
     // To bypass name clashes, they're sometimes instead suffixed with _.
-    constructor(address _testAddress) payable {
-        testAddress = _testAddress;
+    constructor(address testAddress_) payable {
+        _testAddress = testAddress_;
     }
 
     function createTest() public {
         bytes32[] memory proposalNames;
-        target = new Test(proposalNames, 0);
+        _target = new Test(proposalNames, 0);
 
-        testAddress = address(target);
+        _testAddress = address(_target);
 
         // TODO
         // create with ether???
@@ -1024,7 +1024,7 @@ contract Tester {
         // Only an address that is made payable has transfer() and send() members.
         // Implicit conversion to payable was removed in 0.8.0
         // Address conversion compatible types: uint160, bytes20 and contract types
-        address payable ptestAddress = payable(testAddress);
+        address payable ptestAddress = payable(_testAddress);
 
         // These only send 2300 gas! ("to prevent reentry")
         // Usage no longer recommended since EIP1884 increases the gas cost of certain opcodes, possibly making
@@ -1037,13 +1037,13 @@ contract Tester {
         // or reentrancy guards (eg. OpenZeppelin's ReentrancyGuard) for reentrancy protection.
 
         // Low-level call funcs (using opcodes, allows calling non-ABI compatible addresses):
-        (bool success,) = testAddress.call{ value: msg.value, gas: 2300 }(""); // Only what happened within call reverts on failure!
+        (bool success,) = _testAddress.call{ value: msg.value, gas: 2300 }(""); // Only what happened within call reverts on failure!
         //           ^                    ^ {} notation since 0.7.0, before: .value(msg.value).gas(2300)
         //           ^ Return value deconstruction with skipping by omission.
         if (!success) revert();
 
         // High Level calling other contracts also allows sending to external payable funcs.
-        // target.payMe{value: 1 wei}();
+        // _target.payMe{value: 1 wei}();
         // Because the Test Interface/Contract has payable functions, the address to cast from must be paybable too
         ITest test = ITest(ptestAddress);
         test.payMe{value: 1 wei}();
