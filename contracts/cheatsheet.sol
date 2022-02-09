@@ -397,7 +397,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      *    The order influences how fast the function selector will be able to pick the called function.
      *  - declare functions as payable in order to omit the value-is-zero check that is added by default.
      *    Make sure there's a way to withdraw unintentionally sent ether though.
-     *  - name the function so its signature has many zeros as a prefix (deposit_CIx = 0x00007693)
+     *  - name the function so its signature has many zeros as a prefix (deposit_CIx() = 0x00007693)
      *    Tool: https://emn178.github.io/solidity-optimize-name/ - make sure you have no func sig clashes!
      *  - have it make use of events instead of storage as much as possible.
      */
