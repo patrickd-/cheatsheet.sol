@@ -130,6 +130,8 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
                                     // Only public state vars can have NatSpec comments (since 0.7.0)
     bool internal _intBool = false; // Can only be used from this or inheriting contracts.
 
+    uint internal _mutex = 1;   // See reentrancyGuard modifier.
+
     bytes32[3] private _privA; // contains 3, 32 bytes long bytearrays filled with zeros,
                                //   because it's statically sized!
                                // Can only be used within this Test contract (private),
@@ -328,6 +330,23 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     modifier paramCheck(uint test) {
         require(test > 0);
         _;
+    }
+
+    /**
+     * State variables such as a reentrancy guard mutex change often within the same transaction.
+     *
+     * For such cases it is best to set a non-zero value during construction since changing a state
+     * variable from zero to a non-zero value is much more expensive than toggling between two
+     * different non-zero values.
+     *
+     * Since only a certain amount of gas is reimbursed for freeing storage (refund quota), it's
+     * also better to not waste that quota here for toggling.
+     */
+    modifier reentrancyGuard() {
+        require(_mutex == 1);
+        _mutex = 2;
+        _;
+        _mutex = 1;
     }
 
     /**
