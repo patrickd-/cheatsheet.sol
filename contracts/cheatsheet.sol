@@ -382,7 +382,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      *    Tool: https://emn178.github.io/solidity-optimize-name/ - make sure you have no func sig clashes!
      *  - have it make use of events instead of storage as much as possible.
      */
-    function deposit_CIx() external payable {
+    function deposit_CIx() external payable { // solhint-disable-line func-name-mixedcase
         emit ChingChing(msg.sender, msg.value);
     }
 
