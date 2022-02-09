@@ -371,6 +371,22 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     event ChingChing(address indexed sender, uint moneyz);
 
     /**
+     * If you have a function that will be called very often, in order to safe gas..
+     *  - declare functions as external and make use of calldata location for parameters.
+     *    This will avoid expensive memory copying operations when the function is called.
+     *  - declare external functions ordered by how likely they are to be called, most to least.
+     *    The order influences how fast the function selector will be able to pick the called function.
+     *  - declare functions as payable in order to omit the value-is-zero check that is added by default.
+     *    Make sure there's a way to withdraw unintentionally sent ether though.
+     *  - name the function so its signature has many zeros as a prefix (deposit_CIx = 0x00007693)
+     *    Tool: https://emn178.github.io/solidity-optimize-name/ - make sure you have no func sig clashes!
+     *  - have it make use of events instead of storage as much as possible.
+     */
+    function deposit_CIx() external payable {
+        emit ChingChing(msg.sender, msg.value);
+    }
+
+    /**
      * When delete is applied on a struct, all its elemts are reset to zero-state,
      * except mappings!
      *
