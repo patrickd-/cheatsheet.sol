@@ -478,6 +478,10 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         // when accessed in library-like contracts if meta-transaction are used.
         // Consider accessing these values via OpenZeppelin Context library instead.
         emit ChingChing(msg.sender, msg.value);
+        // Also note the danger of accessing msg.value within a loop. If, for example,
+        // this contract implements a function allowing to batch multiple calls into one
+        // it would allow calling payMe() multiple times with the same msg.value making
+        // it look like the sender paid multiple times although he only send value once.
     }
 
     function checkBalance() external view returns (uint) {
