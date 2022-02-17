@@ -1108,6 +1108,10 @@ library UnsafeMath {
      * A library can be attached to a type inside a contract (only active within that contract:
      *   "using UnsafeMath for uint8;"
      * These functions will receive the object they are called on as their first parameter.
+     *
+     * External/Public function of linked libraries can only be called via DELEGATECALL.
+     * This is an automatic protection to prevent killing libraries by calling a function
+     * containing SELFDESTRUCT() which would brick contract using the library.
      */
     function sub(uint8 a, uint8 b) public pure returns (uint8) {
         // Before 0.8.0 a SafeMath library should have been used, now its save
