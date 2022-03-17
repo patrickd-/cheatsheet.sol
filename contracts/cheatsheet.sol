@@ -2,9 +2,9 @@
 // ^ recommended, included machine readable in bytecode metadata
 // Software Package Data Exchange is an open standard
 
-pragma solidity ^0.8.7;
-// ^ floating pragma, min 0.8.7 max excluding 0.9.0
-// same as complex pragma: pragma solidity >=0.8.7 <0.9.0;
+pragma solidity ^0.8.13;
+// ^ floating pragma, min 0.8.13 max excluding 0.9.0
+// same as complex pragma: pragma solidity >=0.8.13 <0.9.0;
 // major.breakingchanges.bugfixes
 // only makes the compiler check for compatibility and throws error if not matching!
 // should only be floating during development, fixed everywhere during testing & deployment
@@ -544,8 +544,15 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         );
     }
 
-    // Apply library to a type, but only within this contract (inheritable pre 0.7.0)
+    // Apply library to a type, but only within this contract (inheritable pre 0.7.0).
     using UnsafeMath for uint8; // Works for all types! Can't be done in functions!
+    // Since 0.8.13 this can be used
+    //   - at file level and then applied gobally for user defined types
+    //   - with individual library functions and free functions
+    // eg.:
+    //   type uuint8 is uint8;
+    //   using { UnsafeMath.sub, UnsafeMath.add } for uuint8 global;
+
     function unsafeMath(uint8 a, uint8 b) public pure returns (uint8 subbed, uint8 diffedUp, uint8 diffedRight) {
         // Results from libraries are returned and not applied to the value!
         subbed = a.sub(b); // Calls sub(a, b) on the UnsafeMath library
@@ -1046,6 +1053,8 @@ contract Tester {
 
         // If execution reaches a catch-block, then the state-changing effects of the external call have been reverted.
         // The caller always retains 1/64th of the gas in a call and thus even if the called contract goes out of gas (consumes 63/64 of all gas), the caller still has some gas left
+
+        // abi.encodeCall() was added with 0.8.11 and had a bug until 0.8.13 where hex and string literals directly passed as arguments would be incorrectly encoded with implicitly compatible types (eg. uint16 instead of bytes2, which have differing alignments)
     }
 
     /**
@@ -1119,6 +1128,13 @@ library UnsafeMath {
         // Old wrapping behavior still available in unchecked mode:
         unchecked {
             a -= b; // Shorthand operators are supported.
+        }
+        return a;
+    }
+
+    function add(uint8 a, uint8 b) public pure returns (uint8) {
+        unchecked {
+            a += b;
         }
         return a;
     }
