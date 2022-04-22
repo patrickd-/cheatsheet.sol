@@ -112,7 +112,7 @@ contract AdvTestBase is TestBase, TestBase2 {
  */
 contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
 
-    // TODO refactor to follow best practices regarding ordering of elements within contract/file
+    // TODO refactor to follow best practices regarding ordering of elements within contract/file:
     // Pragma statements, Import statements, Interfaces, Libraries, Contracts. Inside each contract,
     // library or interface, use the following order: Type declarations, State variables, Events, Functions
     // Order of Functions: Ordering helps readers identify which functions they can call and to find the
@@ -212,12 +212,24 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
             // since they do not necessarily occupy a single full storage slot. Therefore, their “address”
             // is composed of a slot and a byte-offset inside that slot.
             let rightAndLeftValues := sload(_left.slot)
-            // let leftValue := rightAndLeftValues[_left.offset] TODO how?
+
+            // To get the value on the rightmost side of the slot, we can use a mask to remove the left value.
+            // Although Solidity will take care of masking the first byte when reading a uint248, we should
+            // remove it to ensure there are no "dirty" upper bits that can cause issues somewhere else.
+            let rightValue := and(rightAndLeftValues, 0x00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+
+            // To get the value on the leftmost side of the slot, we have to shift it to the right.
+            // While shifting the rightmost value will "fall out" of the slot while the left is filled with zeros.
+            // _left.offset will be 31 -> 31*8 is 248 bits that have to be shifted:
+            let leftValue := shr(mul(_left.offset, 8), rightAndLeftValues)
+            // Shift operators (shl(x, y), shr(x, y), sar(x, y)) in Solidity assembly apply the
+            // shift operation of x bits on y and not the other way around, which may be confusing.
+            // Make sure you have the parameters in the right order!
 
             // You can assign to the .slot part of a local storage variable pointer.
             // For these (structs, arrays or mappings), the .offset part is always zero. It is not
-            // possible to assign to the .slot or .offset part of a state variable, though
-
+            // possible to assign to the .slot or .offset part of a state variable, though:
+            // pubInt.slot := 0x0 // Not allowed, use sstore() instead.
 
             // Reserved Memory: Solidity reserves four 32-byte slots, with specific byte ranges
             // (inclusive of endpoints) being used as follows:
@@ -228,18 +240,26 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
             // There is no guarantee that the memory has not been used before and thus you cannot
             // assume that its contents are zero bytes. There is no built-in mechanism to release
             // or free allocated memory.
-            // TODO example using new memory and increasing pointer
+            //
+            // The free memory pointer will start pointing to the address immediately after the
+            // reserved memory slots, to 0x80. Although any addresses can be accessed (not only
+            // chunks of 32 bytes), Solidity always uses memory in 32-byte-chunks and you should
+            // do so too: Don't forget to increase the pointer by 32 for each new chunk written to!
+            let freeMemoryPointer := mload(0x40)
+            mstore(freeMemoryPointer, 42) // Storing the answer to life the universe and everything.
+            mstore(0x40, add(freeMemoryPointer, 32)) // Reserve now used memory space.
+
+            // Although there are if-statements in Yul, they don't have "else":
+            if eq(freeMemoryPointer, 0x80) { /*...*/ }
+            // Instead, switch statements offer "default":
+            switch freeMemoryPointer
+            case 0x80 { /*...*/ }
+            default { /*...*/ }
 
             // TODO
-            // if statements, e.g. if lt(a, b) { sstore(0, 1) }
-            // switch statements, e.g. switch mload(0) case 0 { revert() } default { mstore(0, 1) }
+            // https://docs.soliditylang.org/en/v0.8.9/yul.html
             // for loops, e.g. for { let i := 0} lt(i, 10) { i := add(i, 1) } { mstore(i, 7) }
             // function definitions, e.g. function f(a, b) -> c { c := add(a, b) }
-
-
-            // Shift operators (shl(x, y), shr(x, y), sar(x, y)) in Solidity assembly apply the
-            // shift operation of x bits on y and not the other way around, which may be confusing.
-            // Make sure you have the parameters in the right order!
         }
     }
 
@@ -270,6 +290,9 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      * Return variables can be pre-named and set like normal local variables.
      * Will be initialized with default zero-state.
      * No return statement necessary!
+     *
+     * Best-practice: Don't declare named return variables if you don't actually use them.
+     *                And aim for consistency, either use them everywhere or nowhere.
      *
      * We're also using Function Overloading here! Same name different params!
      *
@@ -530,9 +553,6 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
 
 
     // Integers come in sizes between 8 to 256 bit, in steps of 8.
-    // Aside from obvious math arithmetic operators, it can do
-    // Bitwise & (AND) | (OR) ^ (XOR) ~ (NEG)
-    // Shift << (left) >> (right)
     function iHaveAnIntling() public pure returns (uint, uint, int, int) {
         return(
             // uintX range
@@ -542,6 +562,26 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
             type(int16).min, // (2**X)/2 * -1
             type(int16).max  // (2**X)/2 - 1
         );
+    }
+
+    // Aside from obvious math arithmetic operators, integers also support:
+    // Bitwise & (AND) | (OR) ^ (XOR) ~ (NEG)
+    // Shift << (left) >> (right)
+    // Note there's well tested libraries like OpenZeppelin's BitMaps for this!
+    function bitmapGet(uint256 map, uint8 index) external pure returns (bool) {
+        // Example with a map of ..11000101 and index 2:
+        // 1) Create Mask: Left-shift 2 the number one (..00000001 becomes ..00000100)
+        // 2) Apply Mask on map: ..11000101 AND 00000100 = 00000100
+        // 3) Value greater than zero? -> true
+        return map & (1 << index) > 0;
+    }
+    function bitmapSet(uint256 map, uint8 index, bool val) external pure returns (uint256) {
+        if (val) {
+            return map | (1 << index);
+        }
+        else {
+            return map & ~(1 << index);
+        }
     }
 
     // Apply library to a type, but only within this contract (inheritable pre 0.7.0).
@@ -564,13 +604,6 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         diffedUp = (a / 255) * b;                        // (7 / 255) * 255 = 0
         diffedRight = uint8((uint(a) * uint(b)) / 255);  // (7 * 255) / 255 = 7
     }
-
-
-    // Shifty business?????
-    // Space efficient boolean array with bitmaps in uintX
-    // Read: bitmap & (1 << index) > 0
-    // Use bitwise OR to set true, AND with XOR'ed mask to set false, XOR to toggle
-    // Better to use well tested libraries: OpenZeppelin BitMaps.
 
     /**
      * Private functions are often prefixed with underscore.
