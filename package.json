@@ -7,6 +7,6 @@
   },
   "devDependencies": {
     "solc": "0.8.15",
-    "solhint": "git+https://git@github.com/patrickd-/solhint.git#e596ac53526115e3816b7bc58265ff80a27c88c5"
+    "solhint": "git+https://git@github.com/patrickd-/solhint.git#8a1a1899754502b6712c3eccb2e39eebf61e1233"
   }
 }

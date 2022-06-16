@@ -201,7 +201,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         // because support for the annotation will be removed in some future version.
         //
         /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             // Yul parses comments, literals and identifiers in the same way as Solidity.
             // You can access Solidity variables and other identifiers by using their name.
             // Local variables of value type are directly usable in inline assembly
