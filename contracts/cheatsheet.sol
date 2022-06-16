@@ -2,9 +2,9 @@
 // ^ recommended, included machine readable in bytecode metadata
 // Software Package Data Exchange is an open standard
 
-pragma solidity ^0.8.13;
-// ^ floating pragma, min 0.8.13 max excluding 0.9.0
-// same as complex pragma: pragma solidity >=0.8.13 <0.9.0;
+pragma solidity ^0.8.15;
+// ^ floating pragma, min 0.8.15 max excluding 0.9.0
+// same as complex pragma: pragma solidity >=0.8.15 <0.9.0;
 // major.breakingchanges.bugfixes
 // only makes the compiler check for compatibility and throws error if not matching!
 // should only be floating during development, fixed everywhere during testing & deployment
@@ -192,6 +192,15 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         // Inline assembly is a way to access the Ethereum Virtual Machine at a low level.
         // The language used for inline assembly is called Yul which has improved readability.
         // Use of EVM assembly is error-prone and should be avoided or double-checked for correctness.
+        //
+        // Since 0.8.13 assembly blocks can be marked as "memory-safe" this will allow the compiler
+        // for better gas optimizations. Yul-code MUST follow Solidity's memory model in this case!
+        // The annotation below allows marking the block while maintaining backwards compatibility
+        // with previous solidity versions (and also with solhint which currently has parsing issues).
+        // The future-proof way to mark an assembly block is: `assembly ("memory-safe") {`
+        // because support for the annotation will be removed in some future version.
+        //
+        /// @solidity memory-safe-assembly
         assembly {
             // Yul parses comments, literals and identifiers in the same way as Solidity.
             // You can access Solidity variables and other identifiers by using their name.
@@ -260,6 +269,11 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
             // https://docs.soliditylang.org/en/v0.8.9/yul.html
             // for loops, e.g. for { let i := 0} lt(i, 10) { i := add(i, 1) } { mstore(i, 7) }
             // function definitions, e.g. function f(a, b) -> c { c := add(a, b) }
+
+            // 0.8.13 and 0.8.14 had a bug where memory writing operations in YUL were removed if they
+            // were not read from within the same inline assembly block.
+            mstore(0x420, 1) // 0x420 is not accessed again here, this operation would've been removed.
+            // Happens when no surrounding Solidity variable is accessed and --via-ir was not used.
         }
     }
 
