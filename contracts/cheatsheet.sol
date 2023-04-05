@@ -314,7 +314,6 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
      *
      * External means it can only be called via messages! (Other contracts/transactions)
      * Or, by the same contract, using `this.echo(uint8(1))`!
-     * External is preferrable over public since it can use calldata data location.
      */
     function echo(uint8 test) external pure returns (uint8 testr) {
         testr = test;
@@ -428,7 +427,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
 
     /**
      * If you have a function that will be called very often, in order to safe gas..
-     *  - declare functions as external and make use of calldata location for parameters.
+     *  - declare functions as external/public and make use of calldata location for parameters.
      *    This will avoid expensive memory copying operations when the function is called.
      *  - declare external functions ordered by how likely they are to be called, most to least.
      *    The order influences how fast the function selector will be able to pick the called function.
