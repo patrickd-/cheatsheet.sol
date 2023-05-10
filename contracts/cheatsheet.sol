@@ -427,7 +427,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
 
     /**
      * If you have a function that will be called very often, in order to safe gas..
-     *  - declare functions as external/public and make use of calldata location for parameters.
+     *  - functions that will be called externally can make use of calldata location for parameters.
      *    This will avoid expensive memory copying operations when the function is called.
      *  - declare external functions ordered by how likely they are to be called, most to least.
      *    The order influences how fast the function selector will be able to pick the called function.
