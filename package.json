@@ -6,7 +6,7 @@
     "lint": "solhint 'contracts/cheatsheet.sol'"
   },
   "devDependencies": {
-    "solc": "0.8.15",
-    "solhint": "git+https://git@github.com/patrickd-/solhint.git#8a1a1899754502b6712c3eccb2e39eebf61e1233"
+    "solc": "0.8.27",
+    "solhint": "5.0.3"
   }
 }

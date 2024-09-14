@@ -398,7 +398,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
         // It's not possible to completely omit the underscore though, that's a syntax error.
     }
     function _doStuff() private {
-        freeFunction(_privA);
+        _freeFunction(_privA);
     }
 
     // This modifier takes parameters (see the echo function on how values are passed).
@@ -699,7 +699,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
     // ^ Since 0.8.13
     //    - Not only libraries but also free functions (ie. functions outside of contracts) and specific
     //      library function may be applied to a type:
-    //      using { freeFunction, UnsafeMath.add } for Price;
+    //      using { _freeFunction, UnsafeMath.add } for Price;
     //    - Can be declared outside of a contract's scope, applying to the entire file.
     //    - Can additionally be declared as "global", applying to files that import it as well.
     //    - If the type is User Defined, that type's declaration must be in the same file as its global usage.
@@ -1143,7 +1143,7 @@ contract Test is ITest, AdvTestBase, Storage, ownerNamespace.Owner, Ballot {
  * C99 scoping rules (solc >=0.5.0). Prior, the usage of a variable before its declaration
  * (either declared later or in another scope) led to unexpected behavior.
  */
-function freeFunction(bytes32[3] storage arrrr) {
+function _freeFunction(bytes32[3] storage arrrr) {
     // If you intent to work on a storage value (accessing it multiple times),
     // first copy its value into memory, work on it and then set storage once!
     bytes32[3] memory val = arrrr;
